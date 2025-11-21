@@ -134,6 +134,9 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
+            "OPTIONS": {
+                "timeout": 20,  # Increase timeout for concurrent access
+            },
         }
     }
 
@@ -187,6 +190,8 @@ Q_CLUSTER = {
     "retry": 3 * 60 + 30,  # has to be longer than timeout
 }
 if DEBUG:
+    # Use sync mode to avoid SQLite multiprocessing issues
+    Q_CLUSTER["sync"] = True
     Q_CLUSTER["workers"] = 1
 
 DJANGO_SITE_DOMAIN_NAME = parsenvy.str("DJANGO_SITE_DOMAIN_NAME")
