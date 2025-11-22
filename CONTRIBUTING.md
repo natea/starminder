@@ -69,6 +69,18 @@ just lintfix
    uv sync
    ```
 
+2. Copy the `.env.example` file into a `.env` file. Be sure to fill in the Github values:
+
+   ```bash
+   DJANGO_DEBUG=True
+   DJANGO_SECRET_KEY=insecure-dev-key-for-starminder
+   DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+   DJANGO_SITE_DOMAIN_NAME=127.0.0.1:8000
+   DJANGO_SITE_DISPLAY_NAME="Starminder Local"
+   GITHUB_CLIENT_ID="replace-with-github-client-id"
+   GITHUB_SECRET="replace-with-github-secret"
+   ```
+
 2. Run migrations:
    ```bash
    just migrate
