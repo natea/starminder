@@ -51,3 +51,9 @@ deploy:
 
 startjobs:
     uv run python manage.py start_jobs
+
+setup_social_app:
+	uv run python manage.py setup_social_app
+
+createsuperuser:
+	uv run python manage.py createsuperuser
