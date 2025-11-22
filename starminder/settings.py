@@ -15,6 +15,23 @@ load_dotenv()
 logger.remove()
 logger.add(sys.stdout)
 
+# Enable detailed logging for allauth
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "allauth": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+        },
+    },
+}
+
 
 DEBUG = parsenvy.bool("DJANGO_DEBUG")
 
@@ -178,7 +195,20 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 if DEBUG:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
+
 SOCIALACCOUNT_STORE_TOKENS = True
+SOCIALACCOUNT_AUTO_SIGNUP = True  # Allow automatic user creation during OAuth
+SOCIALACCOUNT_ADAPTER = "starminder.core.adapters.DebuggingSocialAccountAdapter"
+
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {
+        "SCOPE": [
+            "user",
+            "read:user",
+            "user:email",
+        ],
+    }
+}
 
 ADMIN_PREFIX = parsenvy.str("DJANGO_ADMIN_PREFIX", "")
 

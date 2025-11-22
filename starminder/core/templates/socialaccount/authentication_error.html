@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Third-Party Login Failure</h1>
+
+<p>An error occurred while attempting to login via your third-party account.</p>
+
+{% if exception %}
+<h2>Debug Information:</h2>
+<pre>{{ exception }}</pre>
+{% endif %}
+
+<p><a href="/">Return to home</a></p>
+{% endblock %}
