@@ -161,15 +161,21 @@ def create_user_profile(
             user=instance,
             defaults={"reminder_email": instance.email},
         )
-        schedule(
-            "starminder.implementations.jobs.user_job",
-            instance.id,
-            next_run=datetime.now() + timedelta(minutes=1),
-        )
+        try:
+            schedule(
+                "starminder.implementations.jobs.user_job",
+                instance.id,
+                next_run=datetime.now() + timedelta(minutes=1),
+            )
+        except Exception as e:
+            # Don't let scheduling errors prevent user creation
+            from loguru import logger
+            logger.error(f"Failed to schedule user job for {instance.username}: {e}")
+        
         if not settings.DEBUG:
             send_push_notification(
                 message=f"New user signed up: {instance.username}",
-                title="New Starminder Signup",
+                title="Starminder Signup",
             )
 
 
