@@ -1,5 +1,10 @@
 from django.conf import settings
-from django.db.models import CASCADE, CharField, ForeignKey, IntegerField, Manager
+from django.db.models import (
+    CASCADE, BinaryField, BooleanField, CharField, DateTimeField,
+    FloatField, ForeignKey, IntegerField, ManyToManyField, Manager,
+    OneToOneField, TextField
+)
+from django.db import models
 import emoji
 
 from starminder.core.models import StarFieldsBase, TimestampedModel
@@ -65,3 +70,45 @@ class Tag(TimestampedModel):
 
     def __str__(self) -> str:
         return self.name
+
+
+class StarAnalysis(TimestampedModel):
+    """AI analysis and embeddings for a starred repository."""
+
+    objects: "Manager[StarAnalysis]"
+
+    # Core relationships
+    star = OneToOneField(Star, on_delete=CASCADE, related_name='analysis')
+    tags = ManyToManyField(Tag, related_name='stars', blank=True)
+
+    # Content and embeddings
+    readme_content = TextField(null=True, blank=True)
+    readme_embedding = BinaryField(null=True, blank=True)  # numpy array as bytes
+    description_embedding = BinaryField(null=True, blank=True)
+
+    # Analysis metadata
+    analysis_date = DateTimeField(null=True, blank=True)
+    analysis_version = CharField(max_length=50, blank=True)  # e.g., "gpt-4-turbo-2024-04"
+    priority_score = FloatField(default=0.0, db_index=True)
+
+    # Repository health metrics
+    last_commit_date = DateTimeField(null=True, blank=True)
+    language = CharField(max_length=50, null=True, blank=True)
+    health_score = FloatField(default=0.5)  # 0 (stale) to 1 (very active)
+
+    # Processing tracking
+    fetch_attempted = BooleanField(default=False)
+    fetch_error = TextField(null=True, blank=True)
+    analysis_attempted = BooleanField(default=False)
+    analysis_error = TextField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Star Analysis"
+        verbose_name_plural = "Star Analyses"
+        indexes = [
+            models.Index(fields=['-priority_score']),
+            models.Index(fields=['analysis_date']),
+        ]
+
+    def __str__(self) -> str:
+        return f"Analysis for {self.star}"
