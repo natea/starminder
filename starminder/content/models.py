@@ -112,3 +112,24 @@ class StarAnalysis(TimestampedModel):
 
     def __str__(self) -> str:
         return f"Analysis for {self.star}"
+
+
+class ClusterAssignment(TimestampedModel):
+    """Assigns a star to a similarity cluster."""
+
+    objects: "Manager[ClusterAssignment]"
+
+    cluster_id = IntegerField(db_index=True)
+    star = OneToOneField(Star, on_delete=CASCADE, related_name='cluster_assignment')
+    centroid_distance = FloatField()  # Distance from cluster center
+    generated_at = DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Cluster Assignment"
+        verbose_name_plural = "Cluster Assignments"
+        indexes = [
+            models.Index(fields=['cluster_id', 'centroid_distance']),
+        ]
+
+    def __str__(self) -> str:
+        return f"Cluster {self.cluster_id}: {self.star.owner}/{self.star.name}"
